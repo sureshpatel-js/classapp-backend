@@ -1,10 +1,12 @@
-const app = require("./server");
-const userRouter = require("./routers/userRoute");
+const app = require('./server');
+const userRouter = require('./routers/userRoute');
+const authRouter = require('./routers/authRoute');
+const serverDbConnect = require('./serverDbConnect');
+serverDbConnect();
+app.use('/auth',authRouter);
+app.use('/user', userRouter);
 
-const serverDbConnect = require("./serverDbConnect");
-//serverDbConnect();
 
-app.use("/user", userRouter);
 
 app.use((err, req, res, next) => {
   const { status, message } = err;

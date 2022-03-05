@@ -2,8 +2,12 @@ const Joi = require("joi");
 
 exports.validateUserBody = async (body) => {
   const schema = Joi.object({
-    firstName: Joi.string().required(),
-    lastName: Joi.string().required(),
+    first_name: Joi.string().required(),
+    last_name: Joi.string().required(),
+    email: Joi.string().email({
+      minDomainSegments: 2,
+      tlds: { allow: ["com", "net"] },
+    }),
   });
   try {
     const value = await schema.validateAsync(body);
