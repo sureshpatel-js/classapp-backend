@@ -4,7 +4,7 @@ exports.validateUserBody = async (body) => {
   const schema = Joi.object({
     first_name: Joi.string().required(),
     last_name: Joi.string().required(),
-    email: Joi.string().email({
+    email: Joi.string().required().email({
       minDomainSegments: 2,
       tlds: { allow: ["com", "net"] },
     }),

@@ -14,6 +14,9 @@ const userSchema = new Schema({
   password: {
     type: String,
   },
+  password_createdAt_time: {
+    type: Number,
+  },
   otp: {
     type: String,
   },
