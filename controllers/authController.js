@@ -4,10 +4,11 @@ const AppError = require("../utils/AppError");
 const {
   validateSetPasswordBody,
   validateLogIn,
+  validateGenerateOtpBody,
 } = require("../validate/validateAuth");
 const { checkOtp } = require("../utils/otp");
 const { checkPassword } = require("../utils/password");
-
+const { INTERNAL_SERVER_ERROR } = require("../constants/authConstants");
 exports.setPassword = async (req, res, next) => {
   const { email, password, otp } = req.body;
 
@@ -80,4 +81,36 @@ exports.logIn = async (req, res, next) => {
   res.status(200).json({
     message: "You are logged in successfully.",
   });
+};
+
+exports.generateOtp = async (req, res, next) => {
+  const { email } = req.body;
+  const value = await validateGenerateOtpBody(req.body);
+  if (!value.status) {
+    next(new AppError(400, value.message));
+    return;
+  }
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      res.status(404).json({
+        message: `User does not exist with this ${email} email.`,
+      });
+      return;
+    }
+    const { hashOtp, otpTime } = await generateOtpAndTime();
+    const updatedUser = await User.findByIdAndUpdate(user._id, {
+      otp: hashOtp,
+      otp_time: otpTime,
+    });
+    if (!updatedUser) {
+      next(new AppError(500),INTERNAL_SERVER_ERROR);
+    }
+    res.status(200).json({
+      message: `Check your email: ${updatedUser.email} for OTP.`,
+      email: updatedUser.email,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };

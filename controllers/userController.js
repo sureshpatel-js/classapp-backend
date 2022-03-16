@@ -17,6 +17,7 @@ exports.createUser = async (req, res, next) => {
       });
       const { first_name, last_name, email } = newUser;
       res.status(201).json({
+        message:`Check your email: ${email} for OTP.`,
         user: {
           first_name,
           last_name,
