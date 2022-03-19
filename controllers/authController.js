@@ -1,13 +1,14 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const AppError = require("../utils/AppError");
+const { generateOtpAndTime, checkOtp } = require("../utils/otp");
 const {
   validateSetPasswordBody,
   validateLogIn,
   validateGenerateOtpBody,
 } = require("../validate/validateAuth");
-const { checkOtp } = require("../utils/otp");
 const { checkPassword } = require("../utils/password");
+const { getJwt } = require("../utils/jwt");
 const { INTERNAL_SERVER_ERROR } = require("../constants/authConstants");
 exports.setPassword = async (req, res, next) => {
   const { email, password, otp } = req.body;
@@ -77,9 +78,15 @@ exports.logIn = async (req, res, next) => {
     });
     return;
   }
-
+  const token = await getJwt(user._id);
   res.status(200).json({
     message: "You are logged in successfully.",
+    token,
+    user: {
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name,
+    },
   });
 };
 
@@ -104,7 +111,7 @@ exports.generateOtp = async (req, res, next) => {
       otp_time: otpTime,
     });
     if (!updatedUser) {
-      next(new AppError(500),INTERNAL_SERVER_ERROR);
+      next(new AppError(500), INTERNAL_SERVER_ERROR);
     }
     res.status(200).json({
       message: `Check your email: ${updatedUser.email} for OTP.`,
@@ -114,3 +121,7 @@ exports.generateOtp = async (req, res, next) => {
     console.log(error);
   }
 };
+
+exports.protectRoute = async()=>{
+  
+}
