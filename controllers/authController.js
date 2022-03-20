@@ -8,8 +8,12 @@ const {
   validateGenerateOtpBody,
 } = require("../validate/validateAuth");
 const { checkPassword } = require("../utils/password");
-const { getJwt } = require("../utils/jwt");
-const { INTERNAL_SERVER_ERROR } = require("../constants/authConstants");
+const { getJwt, verifyJwt } = require("../utils/jwt");
+const {
+  INTERNAL_SERVER_ERROR,
+  USER_BELONGS_TO_THIS_TOKEN_DELETED,
+  YOU_HAVE_NOT_CREATED_PASSWORD_YET,
+} = require("../constants/authConstants");
 exports.setPassword = async (req, res, next) => {
   const { email, password, otp } = req.body;
 
@@ -68,6 +72,11 @@ exports.logIn = async (req, res, next) => {
     });
     return;
   }
+
+  if (!user.password) {
+    next(new AppError(400, YOU_HAVE_NOT_CREATED_PASSWORD_YET));
+    return;
+  }
   const { status, message } = await checkPassword({
     hashedPassword: user.password,
     password,
@@ -111,7 +120,7 @@ exports.generateOtp = async (req, res, next) => {
       otp_time: otpTime,
     });
     if (!updatedUser) {
-      next(new AppError(500), INTERNAL_SERVER_ERROR);
+      next(new AppError(500, INTERNAL_SERVER_ERROR));
     }
     res.status(200).json({
       message: `Check your email: ${updatedUser.email} for OTP.`,
@@ -122,6 +131,20 @@ exports.generateOtp = async (req, res, next) => {
   }
 };
 
-exports.protectRoute = async()=>{
-  
-}
+exports.protectRoute = async (req, res, next) => {
+  const value = await verifyJwt(req.body.token);
+  if (!value.status) {
+    next(new AppError(401, value.message));
+  }
+  const { id } = value.decoded;
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      next(new AppError(404, USER_BELONGS_TO_THIS_TOKEN_DELETED));
+    }
+    req.user = user;
+  } catch (error) {
+    console.log(error);
+  }
+  next();
+};
