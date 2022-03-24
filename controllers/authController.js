@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const User = require("../models/user");
+const User = require("../models/userModel");
 const AppError = require("../utils/AppError");
 const { generateOtpAndTime, checkOtp } = require("../utils/otp");
 const {
@@ -13,6 +13,7 @@ const {
   INTERNAL_SERVER_ERROR,
   USER_BELONGS_TO_THIS_TOKEN_DELETED,
   YOU_HAVE_NOT_CREATED_PASSWORD_YET,
+  YOU_CHANGED_PASSWORD_PLEASE_LOGIN_AGAIN,
 } = require("../constants/authConstants");
 exports.setPassword = async (req, res, next) => {
   const { email, password, otp } = req.body;
@@ -121,6 +122,7 @@ exports.generateOtp = async (req, res, next) => {
     });
     if (!updatedUser) {
       next(new AppError(500, INTERNAL_SERVER_ERROR));
+      return;
     }
     res.status(200).json({
       message: `Check your email: ${updatedUser.email} for OTP.`,
@@ -131,16 +133,28 @@ exports.generateOtp = async (req, res, next) => {
   }
 };
 
+//1648134614
+//1648134606750
+
 exports.protectRoute = async (req, res, next) => {
-  const value = await verifyJwt(req.body.token);
+  const value = await verifyJwt(req.headers.token);
   if (!value.status) {
     next(new AppError(401, value.message));
+    return;
   }
-  const { id } = value.decoded;
+  console.log(value);
   try {
     const user = await User.findById(id);
     if (!user) {
       next(new AppError(404, USER_BELONGS_TO_THIS_TOKEN_DELETED));
+      return;
+    }
+    const token_createdAt_time = iat * 1000;
+    const { password_createdAt_time } = user;
+    const result = token_createdAt_time > password_createdAt_time;
+    if (!result) {
+      next(new AppError(401, YOU_CHANGED_PASSWORD_PLEASE_LOGIN_AGAIN));
+      return;
     }
     req.user = user;
   } catch (error) {
