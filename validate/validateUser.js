@@ -1,13 +1,16 @@
 const Joi = require("joi");
 
-exports.validateUserBody = async (body) => {
+exports.validateClientAdminSignUp = async (body) => {
   const schema = Joi.object({
     first_name: Joi.string().required(),
     last_name: Joi.string().required(),
-    email: Joi.string().required().email({
-      minDomainSegments: 2,
-      tlds: { allow: ["com", "net"] },
-    }),
+    contact_num: Joi.string().length(10).required(),
+    email: Joi.string()
+      .required()
+      .email({
+        minDomainSegments: 2,
+        tlds: { allow: ["com", "net"] },
+      }),
   });
   try {
     const value = await schema.validateAsync(body);

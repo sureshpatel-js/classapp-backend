@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const userSchema = new Schema({
@@ -8,22 +7,59 @@ const userSchema = new Schema({
   last_name: {
     type: String,
   },
+  user_type: {
+    type: String
+  },
   email: {
     type: String,
   },
-  password: {
+  address: {
+    type: String
+  },
+  company_id: {
+    type: Schema.Types.ObjectId
+  },
+  contact_num: {
     type: String,
   },
-  password_createdAt_time: {
-    type: Number,
+  student_enrollerd_for_subject: {
+    type: Array
   },
-  otp: {
+  student_standard: {
+    type: String
+  },
+  created_at: {
+    type: Date
+  },
+  updated_at: {
+    type: Date
+  },
+  created_by: {
+    type: Schema.Types.ObjectId
+  },
+  hashed_password: {
     type: String,
   },
-  otp_time: {
+  password_updated_at: {
     type: Number,
   },
+  hashed_otp: {
+    type: String,
+  },
+  otp_created_at: {
+    type: Number,
+  },
+  last_login_at: {
+    type: Date
+  },
+
+  active_status: {
+    type: Boolean
+  },
+  email_verified: {
+    type: Boolean
+  }
 });
 
-const User = mongoose.model("User", userSchema);
-module.exports = User;
+const UserModel = mongoose.model("user", userSchema);
+module.exports = UserModel;

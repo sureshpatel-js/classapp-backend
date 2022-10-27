@@ -1,0 +1,1 @@
+exports.PRODUCT_DATA_CREATED_SUCCESS = "Product data created successfully.";

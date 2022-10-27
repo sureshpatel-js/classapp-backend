@@ -1,9 +1,8 @@
 const Joi = require("joi");
 
-exports.validateCreateInstituteBody = async (body) => {
+exports.validateCreateStandardBody = async (body) => {
   const schema = Joi.object({
-    institute_name: Joi.string().required(),
-
+    standard_name: Joi.string().required(),
   });
   try {
     const value = await schema.validateAsync(body);
@@ -14,10 +13,10 @@ exports.validateCreateInstituteBody = async (body) => {
 };
 
 
-exports.validateUpdateInstituteBody = async (body) => {
+exports.validateUpdateStandardBody = async (body) => {
   const schema = Joi.object({
-    institute_name: Joi.string().required(),
-    _id: Joi.string().required(),
+    standard_name: Joi.string().required(),
+    _id: Joi.string().required()
   });
   try {
     const value = await schema.validateAsync(body);

@@ -2,13 +2,14 @@ const Joi = require("joi");
 
 exports.validateSetPasswordBody = async (body) => {
   const schema = Joi.object({
-    email: Joi.string().required().email({
-      minDomainSegments: 2,
-      tlds: { allow: ["com", "net"] },
-    }),
-    password: Joi.string().required(),
-    repeat_password: Joi.ref("password"),
     otp: Joi.string().required(),
+    password: Joi.string().required(),
+    email: Joi.string()
+      .required()
+      .email({
+        minDomainSegments: 2,
+        tlds: { allow: ["com", "net"] },
+      }),
   });
   try {
     const value = await schema.validateAsync(body);
@@ -20,10 +21,12 @@ exports.validateSetPasswordBody = async (body) => {
 
 exports.validateLogIn = async (body) => {
   const schema = Joi.object({
-    email: Joi.string().required().email({
-      minDomainSegments: 2,
-      tlds: { allow: ["com", "net"] },
-    }),
+    email: Joi.string()
+      .required()
+      .email({
+        minDomainSegments: 2,
+        tlds: { allow: ["com", "net"] },
+      }),
     password: Joi.string().required(),
   });
   try {
@@ -34,12 +37,15 @@ exports.validateLogIn = async (body) => {
   }
 };
 
-exports.validateGenerateOtpBody = async (body)=>{
+
+exports.validateGenerateOtpBody = async (body) => {
   const schema = Joi.object({
-    email: Joi.string().required().email({
-      minDomainSegments: 2,
-      tlds: { allow: ["com", "net"] },
-    })
+    email: Joi.string()
+      .required()
+      .email({
+        minDomainSegments: 2,
+        tlds: { allow: ["com", "net"] },
+      }),
   });
   try {
     const value = await schema.validateAsync(body);
@@ -47,4 +53,4 @@ exports.validateGenerateOtpBody = async (body)=>{
   } catch (error) {
     return { status: false, message: error.message };
   }
-}
+};

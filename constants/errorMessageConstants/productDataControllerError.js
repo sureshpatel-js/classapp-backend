@@ -1,0 +1,1 @@
+exports.PRODUCT_DATA_CREATE_ERROR = "Unable to create product data."

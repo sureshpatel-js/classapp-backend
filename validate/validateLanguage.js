@@ -1,9 +1,8 @@
 const Joi = require("joi");
 
-exports.validateCreateInstituteBody = async (body) => {
+exports.validateCreateLanguageBody = async (body) => {
   const schema = Joi.object({
-    institute_name: Joi.string().required(),
-
+    language_name: Joi.string().required(),
   });
   try {
     const value = await schema.validateAsync(body);
@@ -13,10 +12,9 @@ exports.validateCreateInstituteBody = async (body) => {
   }
 };
 
-
-exports.validateUpdateInstituteBody = async (body) => {
+exports.validateUpdateLanguageBody = async (body) => {
   const schema = Joi.object({
-    institute_name: Joi.string().required(),
+    language_name: Joi.string().required(),
     _id: Joi.string().required(),
   });
   try {
